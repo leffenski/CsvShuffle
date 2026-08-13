@@ -25,7 +25,9 @@ public partial class Shuffle : ComponentBase
     List<ObfuscationMode> _modes = [];
     bool _showObfuscated;
 
-    IEnumerable<CsvRow> VisibleGridRows => _showObfuscated ? _obfuscatedGridRows : _gridRows;
+    IEnumerable<CsvRow> VisibleGridRows => _showObfuscated
+        ? _obfuscatedGridRows
+        : _gridRows;
 
     bool QuickFilter(CsvRow row) =>
         string.IsNullOrWhiteSpace(_search)
@@ -34,6 +36,7 @@ public partial class Shuffle : ComponentBase
     async Task LoadFile(InputFileChangeEventArgs args)
     {
         _fileName = args.File.Name;
+
         try
         {
             await using var stream = args.File.OpenReadStream(500_000_000L);
@@ -86,10 +89,7 @@ public partial class Shuffle : ComponentBase
                 _cancellation.Token.ThrowIfCancellationRequested();
 
                 string[] values =
-                [
-                    .. _rows[rowIndex].Select((value, column) =>
-                        Transform(value, _modes[column], consistentValues))
-                ];
+                    [.. _rows[rowIndex].Select((value, column) => Transform(value, _modes[column], consistentValues))];
 
                 obfuscatedRows.Add(new CsvRow(values));
                 output.AppendLine(string.Join(',', values.Select(EncodeCsv)));
@@ -262,6 +262,4 @@ public partial class Shuffle : ComponentBase
 
         return rows;
     }
-
-    sealed record CsvRow(string[] Cells);
 }
