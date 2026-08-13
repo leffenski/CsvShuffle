@@ -85,8 +85,11 @@ public partial class Shuffle : ComponentBase
             {
                 _cancellation.Token.ThrowIfCancellationRequested();
 
-                string[] values = [.. _rows[rowIndex].Select((value, column) =>
-                    Transform(value, _modes[column], consistentValues))];
+                string[] values =
+                [
+                    .. _rows[rowIndex].Select((value, column) =>
+                        Transform(value, _modes[column], consistentValues))
+                ];
 
                 obfuscatedRows.Add(new CsvRow(values));
                 output.AppendLine(string.Join(',', values.Select(EncodeCsv)));
