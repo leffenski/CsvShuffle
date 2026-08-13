@@ -49,20 +49,29 @@
         {
             <MudPaper Outlined
                       Class="pa-2 export-panel">
-                <MudStack Spacing="2" Class="mb-2">
-                    <MudStack Row AlignItems="AlignItems.Center"
+                <MudStack Spacing="2"
+                          Class="mb-2">
+                    <MudStack Row
+                              AlignItems="AlignItems.Center"
                               Justify="Justify.SpaceBetween">
-                        <MudText Typo="Typo.subtitle1" Style="font-family: monospace">
+                        <MudText Typo="Typo.subtitle1"
+                                 Style="font-family: monospace">
                             @_rows.Count.ToString("N0") rows · @_headers.Count columns · @_fileName
                         </MudText>
-                        <MudStack Row AlignItems="AlignItems.Center" Spacing="2">
-                            <MudSwitch @bind-Value="_showObfuscated" Color="Color.Primary"
+                        <MudStack Row
+                                  AlignItems="AlignItems.Center"
+                                  Spacing="2">
+                            <MudSwitch @bind-Value="@_showObfuscated"
+                                       Color="Color.Primary"
                                        Disabled="@(_obfuscatedGridRows.Count == 0)">
                                 View Obfuscated
                             </MudSwitch>
-                            <MudTextField @bind-Value="_search" Immediate Placeholder="Search all columns"
-                                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search"
-                                          Variant="Variant.Outlined" Class="global-search"/>
+                            <MudTextField @bind-Value="@_search"
+                                          Immediate Placeholder="Search all columns"
+                                          Adornment="Adornment.Start"
+                                          AdornmentIcon="@Icons.Material.Filled.Search"
+                                          Variant="Variant.Outlined"
+                                          Class="global-search"/>
                             @if (_busy)
                             {
                                 <MudButton Variant="Variant.Text"
@@ -93,13 +102,16 @@
                             </MudButton>
                         </MudStack>
                     </MudStack>
-                    <MudStack Row Wrap="Wrap.Wrap" Spacing="2" Class="column-treatment-bar">
+                    <MudStack Row
+                              Wrap="Wrap.Wrap"
+                              Spacing="2"
+                              Class="column-treatment-bar">
                         @for (int i = 0; i < _headers.Count; i++)
                         {
                             int index = i;
 
                             <MudSelect T="ObfuscationMode"
-                                       @bind-Value="_modes[index]"
+                                       @bind-Value="@_modes[index]"
                                        Dense
                                        Variant="Variant.Outlined"
                                        Label="@_headers[index]"
@@ -113,7 +125,8 @@
                             </MudSelect>
                         }
                     </MudStack>
-                    <MudStack Row AlignItems="AlignItems.Center">
+                    <MudStack Row
+                              AlignItems="AlignItems.Center">
                         <MudText Typo="Typo.caption"
                                  Style="white-space: nowrap;">
                             @(_busy ? _progressLabel : string.Empty)
