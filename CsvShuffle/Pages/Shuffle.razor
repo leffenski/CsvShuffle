@@ -1,0 +1,157 @@
+@page "/"
+@inject IJSRuntime Js
+
+<PageTitle>
+    CSV Shuffle
+</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.ExtraExtraLarge">
+    <MudStack>
+        <MudStack Row
+                  Class="pt-2"
+                  AlignItems="AlignItems.Center"
+                  Justify="Justify.SpaceBetween">
+            <MudStack Row>
+                <MudImage Src="icon.svg"
+                          Alt="CSV Shuffle Icon"
+                          Width="40"
+                          Height="40"/>
+                <MudText Typo="Typo.h4">
+                    CSV Shuffle
+                </MudText>
+            </MudStack>
+            <MudStack Row AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.caption"
+                         Color="Color.Secondary">
+                    Up to 500 MB · UTF-8 recommended
+                </MudText>
+                <MudButton Variant="Variant.Outlined"
+                           Color="Color.Primary"
+                           StartIcon="@Icons.Material.Filled.FolderOpen"
+                           EndIcon="@Icons.Material.Filled.UploadFile"
+                           HtmlTag="label"
+                           tabindex="0">
+                    Browse for CSV
+                    <InputFile class="file-input"
+                               OnChange="@LoadFile"
+                               accept=".csv,text/csv"/>
+                </MudButton>
+                <MudChip T="string"
+                         Color="Color.Success"
+                         Variant="Variant.Outlined"
+                         Icon="@Icons.Material.Filled.VerifiedUser">
+                    Local only
+                </MudChip>
+            </MudStack>
+        </MudStack>
+
+        @if (_headers.Count > 0)
+        {
+            <MudPaper Outlined
+                      Class="pa-2 export-panel">
+                <MudStack Spacing="2" Class="mb-2">
+                    <MudStack Row AlignItems="AlignItems.Center"
+                              Justify="Justify.SpaceBetween">
+                        <MudText Typo="Typo.subtitle1" Style="font-family: monospace">
+                            @_rows.Count.ToString("N0") rows · @_headers.Count columns · @_fileName
+                        </MudText>
+                        <MudStack Row AlignItems="AlignItems.Center" Spacing="2">
+                            <MudSwitch @bind-Value="_showObfuscated" Color="Color.Primary"
+                                       Disabled="@(_obfuscatedGridRows.Count == 0)">
+                                View Obfuscated
+                            </MudSwitch>
+                            <MudTextField @bind-Value="_search" Immediate Placeholder="Search all columns"
+                                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search"
+                                          Variant="Variant.Outlined" Class="global-search"/>
+                            @if (_busy)
+                            {
+                                <MudButton Variant="Variant.Text"
+                                           Color="Color.Error"
+                                           Size="Size.Small"
+                                           OnClick="@Cancel">
+                                    Cancel
+                                </MudButton>
+                            }
+                            else
+                            {
+                                <MudButton Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           Class="px-6"
+                                           StartIcon="@Icons.Material.Filled.Shuffle"
+                                           Disabled="@_busy"
+                                           OnClick="@Obfuscate">
+                                    Obfuscate
+                                </MudButton>
+                            }
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Primary"
+                                       Size="Size.Large"
+                                       StartIcon="@Icons.Material.Filled.Download"
+                                       Disabled="@(_busy || _obfuscatedCsv is null)"
+                                       OnClick="@Download">
+                                Download
+                            </MudButton>
+                        </MudStack>
+                    </MudStack>
+                    <MudStack Row Wrap="Wrap.Wrap" Spacing="2" Class="column-treatment-bar">
+                        @for (int i = 0; i < _headers.Count; i++)
+                        {
+                            int index = i;
+
+                            <MudSelect T="ObfuscationMode"
+                                       @bind-Value="_modes[index]"
+                                       Dense
+                                       Variant="Variant.Outlined"
+                                       Label="@_headers[index]"
+                                       Class="column-treatment-select">
+                                @foreach (var mode in Enum.GetValues<ObfuscationMode>())
+                                {
+                                    <MudSelectItem Value="@mode">
+                                        @mode
+                                    </MudSelectItem>
+                                }
+                            </MudSelect>
+                        }
+                    </MudStack>
+                    <MudStack Row AlignItems="AlignItems.Center">
+                        <MudText Typo="Typo.caption"
+                                 Style="white-space: nowrap;">
+                            @(_busy ? _progressLabel : string.Empty)
+                        </MudText>
+                        <MudProgressLinear Color="Color.Primary"
+                                           Value="@_progress"
+                                           Rounded/>
+                    </MudStack>
+                </MudStack>
+                <MudDataGrid T="CsvRow" Items="@VisibleGridRows"
+                             QuickFilter="QuickFilter"
+                             Filterable
+                             FilterMode="DataGridFilterMode.ColumnFilterMenu"
+                             FixedHeader
+                             Height="calc(100vh - 400px)"
+                             ColumnResizeMode="ResizeMode.Column"
+                             RowsPerPage="100"
+                             Dense
+                             Hover
+                             Bordered
+                             Virtualize>
+                    <Columns>
+                        @for (int i = 0; i < _headers.Count; i++)
+                        {
+                            int index = i;
+
+                            <PropertyColumn T="CsvRow"
+                                            TProperty="string"
+                                            Property="@(x => x.Cells[index])"
+                                            Title="@_headers[index]"/>
+                        }
+                    </Columns>
+                    <PagerContent>
+                        <MudDataGridPager T="CsvRow"
+                                          PageSizeOptions="@([100, 500, 1000])"/>
+                    </PagerContent>
+                </MudDataGrid>
+            </MudPaper>
+        }
+    </MudStack>
+</MudContainer>

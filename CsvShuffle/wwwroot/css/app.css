@@ -1,0 +1,62 @@
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background: #171522;
+}
+
+.upload-panel {
+  border-style: dashed !important;
+  border-width: 2px !important;
+}
+
+.file-input {
+  opacity: 0;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  cursor: pointer;
+}
+
+.mud-button-label {
+  position: relative;
+}
+
+.column-card {
+  height: 100%;
+}
+
+.column-name {
+  min-height: 2.5rem;
+  overflow-wrap: anywhere;
+}
+
+.global-search {
+  width: min(100%, 22rem);
+}
+
+.column-treatment-bar {
+  overflow-x: auto;
+  padding-bottom: .25rem;
+}
+
+.column-treatment-select {
+  min-width: 10rem;
+}
+
+.export-panel {
+  background: linear-gradient(120deg, rgba(126, 111, 255, .11), transparent 55%);
+}
+
+@media (max-width: 600px) {
+  .preview-heading, .export-layout {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1rem;
+  }
+
+  .global-search {
+    width: 100%;
+  }
+}
