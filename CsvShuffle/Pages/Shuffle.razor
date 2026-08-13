@@ -22,7 +22,7 @@
             </MudStack>
             <MudStack Row AlignItems="AlignItems.Center">
                 <MudText Typo="Typo.caption"
-                         Color="Color.Secondary">
+                         Color="Color.Tertiary">
                     Up to 500 MB · UTF-8 recommended
                 </MudText>
                 <MudButton Variant="Variant.Outlined"
@@ -42,6 +42,12 @@
                          Icon="@Icons.Material.Filled.VerifiedUser">
                     Local only
                 </MudChip>
+                @* <MudTooltip Text="@Layout.ThemeToggleLabel"> *@
+                @*     <MudIconButton Icon="@Layout.ThemeToggleIcon" *@
+                @*                    Color="Color.Primary" *@
+                @*                    aria-label="@Layout.ThemeToggleLabel" *@
+                @*                    OnClick="@Layout.ToggleDarkMode"/> *@
+                @* </MudTooltip> *@
             </MudStack>
         </MudStack>
 
@@ -54,19 +60,33 @@
                     <MudStack Row
                               AlignItems="AlignItems.Center"
                               Justify="Justify.SpaceBetween">
-                        <MudText Typo="Typo.subtitle1"
-                                 Style="font-family: monospace">
-                            @_rows.Count.ToString("N0") rows · @_headers.Count columns · @_fileName
-                        </MudText>
+                        <MudStack Row Spacing="2">
+                            <MudChip T="string"
+                                     Style="font-family: monospace;"
+                                     Variant="Variant.Outlined"
+                                     Color="Color.Tertiary"
+                                     Label="true">
+                                @_fileName
+                            </MudChip>
+                            <MudChip T="string"
+                                     Color="Color.Secondary">
+                                @_headers.Count columns
+                            </MudChip>
+                            <MudChip T="string"
+                                     Color="Color.Secondary">
+                                @_rows.Count.ToString("N0") rows
+                            </MudChip>
+                        </MudStack>
                         <MudStack Row
                                   AlignItems="AlignItems.Center"
                                   Spacing="2">
                             <MudSwitch @bind-Value="@_showObfuscated"
                                        Color="Color.Primary"
                                        Disabled="@(_obfuscatedGridRows.Count == 0)">
-                                View Obfuscated
+                                @(_showObfuscated ? "Scrambled" : "Original")
                             </MudSwitch>
                             <MudTextField @bind-Value="@_search"
+                                          Margin="Margin.Dense"
                                           Immediate Placeholder="Search all columns"
                                           Adornment="Adornment.Start"
                                           AdornmentIcon="@Icons.Material.Filled.Search"
@@ -76,7 +96,8 @@
                             {
                                 <MudButton Variant="Variant.Text"
                                            Color="Color.Error"
-                                           Size="Size.Small"
+                                           Class="px-6"
+                                           StartIcon="@Icons.Material.Filled.Cancel"
                                            OnClick="@Cancel">
                                     Cancel
                                 </MudButton>
@@ -94,7 +115,7 @@
                             }
                             <MudButton Variant="Variant.Outlined"
                                        Color="Color.Primary"
-                                       Size="Size.Large"
+                                       Class="px-6"
                                        StartIcon="@Icons.Material.Filled.Download"
                                        Disabled="@(_busy || _obfuscatedCsv is null)"
                                        OnClick="@Download">
@@ -109,20 +130,22 @@
                         @for (int i = 0; i < _headers.Count; i++)
                         {
                             int index = i;
-
-                            <MudSelect T="ObfuscationMode"
-                                       @bind-Value="@_modes[index]"
-                                       Dense
-                                       Variant="Variant.Outlined"
-                                       Label="@_headers[index]"
-                                       Class="column-treatment-select">
-                                @foreach (var mode in Enum.GetValues<ObfuscationMode>())
-                                {
-                                    <MudSelectItem Value="@mode">
-                                        @mode
-                                    </MudSelectItem>
-                                }
-                            </MudSelect>
+                            <MudTooltip Text="@_headers[index]"
+                                        Delay="500">
+                                <MudSelect T="ObfuscationMode"
+                                           @bind-Value="@_modes[index]"
+                                           Dense
+                                           Variant="Variant.Outlined"
+                                           Label="@_headers[index]"
+                                           Class="column-treatment-select">
+                                    @foreach (var mode in Enum.GetValues<ObfuscationMode>())
+                                    {
+                                        <MudSelectItem Value="@mode">
+                                            @mode
+                                        </MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </MudTooltip>
                         }
                     </MudStack>
                     <MudStack Row
@@ -141,7 +164,7 @@
                              Filterable
                              FilterMode="DataGridFilterMode.ColumnFilterMenu"
                              FixedHeader
-                             Height="calc(100vh - 400px)"
+                             Height="calc(100vh - 380px)"
                              ColumnResizeMode="ResizeMode.Column"
                              RowsPerPage="100"
                              Dense
@@ -168,3 +191,7 @@
         }
     </MudStack>
 </MudContainer>
+
+@code {
+    [CascadingParameter] public MainLayout Layout { get; set; } = null!;
+}
